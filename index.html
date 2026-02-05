@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azure AD OAuth2 SSO Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="login-card">
+      <h1>SSO Login</h1>
+      <p>
+        Diese Demo zeigt einen minimalen OAuth2/SSO Flow mit Azure AD. Hinterlege
+        deine <strong>Client-ID</strong> und <strong>Tenant-ID</strong> in der
+        <code>app.js</code>, um den Flow zu starten.
+      </p>
+      <div class="status">
+        <span>Status:</span>
+        <strong id="statusText">Nicht angemeldet</strong>
+      </div>
+      <button id="loginButton" class="primary">Mit Microsoft anmelden</button>
+      <button id="logoutButton" class="secondary" disabled>Abmelden</button>
+      <section id="tokenSection" class="token" hidden>
+        <h2>Access Token (gekürzt)</h2>
+        <pre id="tokenPreview"></pre>
+      </section>
+      <section id="debugSection" class="debug" hidden>
+        <h2>Debug-Details</h2>
+        <pre id="debugOutput"></pre>
+      </section>
+    </main>
+
+    <script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
