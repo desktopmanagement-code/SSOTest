@@ -353,14 +353,24 @@ async function generatePdfWithChromium(htmlPath, pdfPath, customBrowserPath = ''
 
     for (const headlessFlag of headlessVariants) {
       try {
+        await fs.rm(pdfPath, { force: true });
         await execFileAsync(browserCmd, [headlessFlag, ...baseArgs]);
-        return;
+
+        const stat = await fs.stat(pdfPath).catch(() => null);
+        if (stat && stat.size > 0) {
+          return;
+        }
+
+        lastError = new Error(
+          `Browser-Aufruf mit ${headlessFlag} endete ohne PDF-Datei (${pdfPath}).`,
+        );
       } catch (error) {
         lastError = error;
       }
     }
 
-    throw lastError || new Error('PDF-Export mit Headless-Browser fehlgeschlagen.');
+    const details = lastError?.stderr || lastError?.stdout || lastError?.message || 'Keine Details verfügbar.';
+    throw new Error(`PDF-Export mit Headless-Browser fehlgeschlagen. Details: ${details}`);
   } finally {
     await fs.rm(tempProfileDir, { recursive: true, force: true });
   }
