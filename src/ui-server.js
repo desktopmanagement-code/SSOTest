@@ -106,7 +106,12 @@ async function runGenerator({ company, profile, pdf, outputDir, profileFileName 
 
   if (pdf) args.push('--pdf');
 
-  await execFileAsync('node', args, { cwd: rootDir });
+  await execFileAsync('node', args, {
+    cwd: rootDir,
+    timeout: 120000,
+    windowsHide: true,
+    maxBuffer: 10 * 1024 * 1024,
+  });
 
   return {
     company: normalizedCompany,

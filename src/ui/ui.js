@@ -6,6 +6,17 @@ const result = document.getElementById('result');
 const companySelect = document.getElementById('company-select');
 const downloadPdfBtn = document.getElementById('download-pdf-btn');
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 120000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+
 async function loadCompanies() {
   const response = await fetch('/api/companies');
   const data = await response.json();
@@ -99,7 +110,7 @@ async function handleNormalGenerate(event) {
   const payload = buildPayload();
 
   try {
-    const response = await fetch('/api/generate', {
+    const response = await fetchWithTimeout('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -123,6 +134,10 @@ async function handleNormalGenerate(event) {
       JSON.stringify(data.profile, null, 2),
     ].join('\n');
   } catch (error) {
+    if (error.name === 'AbortError') {
+      result.textContent = 'Fehler:\nZeitüberschreitung beim Generieren. Bitte Browser-/PDF-Setup auf dem Server prüfen.';
+      return;
+    }
     result.textContent = `Fehler:\n${error.message}`;
   }
 }
@@ -133,7 +148,7 @@ async function handleDirectPdfDownload() {
   const payload = buildPayload();
 
   try {
-    const response = await fetch('/api/generate-pdf-download', {
+    const response = await fetchWithTimeout('/api/generate-pdf-download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -161,6 +176,10 @@ async function handleDirectPdfDownload() {
 
     result.textContent = 'PDF wurde erzeugt und als Download an den Browser ausgeliefert.';
   } catch (error) {
+    if (error.name === 'AbortError') {
+      result.textContent = 'Fehler:\nZeitüberschreitung beim Generieren. Bitte Browser-/PDF-Setup auf dem Server prüfen.';
+      return;
+    }
     result.textContent = `Fehler:\n${error.message}`;
   }
 }
