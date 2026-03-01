@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil-Editor</title>
+    <link rel="stylesheet" href="/ui.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Profil-Editor</h1>
+      <p>Fülle die Felder aus und klicke auf <strong>START</strong>. Die JSON wird automatisch gebaut und an den Generator übergeben.</p>
+
+      <form id="profile-form">
+        <section>
+          <h2>Einstellungen</h2>
+          <div class="grid two">
+            <label>Firma
+              <select name="company" id="company-select" required></select>
+            </label>
+            <label class="checkbox"><input type="checkbox" name="pdf" /> PDF lokal im Server-Output speichern</label>
+          </div>
+          <small id="company-help">Configs werden automatisch aus <code>src/config/*.json</code> geladen.</small>
+        </section>
+
+        <section>
+          <h2>Projekt</h2>
+          <div class="grid three">
+            <label>Rolle<input name="project.title" required /></label>
+            <label>Kunde<input name="project.client" required /></label>
+            <label>Ort<input name="project.location" /></label>
+          </div>
+        </section>
+
+        <section>
+          <h2>Persönliche Daten</h2>
+          <div class="grid two">
+            <label>Name<input name="personal.name" required /></label>
+            <label>E-Mail<input name="personal.email" /></label>
+            <label>Telefon<input name="personal.phone" /></label>
+            <label>Standort<input name="personal.location" /></label>
+          </div>
+        </section>
+
+        <section>
+          <h2>Projekterfahrungen</h2>
+          <div id="experience-list"></div>
+          <button type="button" id="add-experience">+ Projekterfahrung</button>
+        </section>
+
+        <section>
+          <h2>Qualifikationen</h2>
+          <label>Ein Eintrag pro Zeile
+            <textarea name="qualifications" rows="4" placeholder="Node.js&#10;TypeScript"></textarea>
+          </label>
+        </section>
+
+        <section>
+          <h2>Zertifizierungen</h2>
+          <label>Ein Eintrag pro Zeile (optional)
+            <textarea name="certifications" rows="4" placeholder="AWS Certified Developer"></textarea>
+          </label>
+        </section>
+
+        <section>
+          <h2>Sonstiges</h2>
+          <label>Ein Eintrag pro Zeile
+            <textarea name="other" rows="4" placeholder="Verfügbar ab ..."></textarea>
+          </label>
+        </section>
+
+        <div class="actions">
+          <button class="start" type="submit">START</button>
+          <button class="download" type="button" id="download-pdf-btn">START + PDF DIREKT DOWNLOAD</button>
+        </div>
+      </form>
+
+      <pre id="result"></pre>
+    </main>
+
+    <template id="experience-template">
+      <article class="experience-item">
+        <div class="grid two">
+          <label>Projektname<input data-key="name" required /></label>
+          <label>Rolle<input data-key="role" /></label>
+          <label>Von<input data-key="from" placeholder="YYYY-MM" /></label>
+          <label>Bis<input data-key="to" placeholder="YYYY-MM" /></label>
+        </div>
+        <label>Beschreibung<textarea data-key="description" rows="3"></textarea></label>
+        <label>Technologien (Komma-getrennt)<input data-key="technologies" placeholder="Node.js, TypeScript" /></label>
+        <button type="button" class="remove">Entfernen</button>
+      </article>
+    </template>
+
+    <script src="/ui.js"></script>
+  </body>
+</html>

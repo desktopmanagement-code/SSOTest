@@ -1,0 +1,15 @@
+{
+  "name": "profile-generator",
+  "version": "1.0.0",
+  "description": "JSON-driven profile generator (HTML + PDF)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "generate": "node src/index.js",
+    "generate:company-a": "node src/index.js --company company-a --profile src/data/profile-with-certs.json",
+    "generate:no-certs": "node src/index.js --company company-b --profile src/data/profile-without-certs.json",
+    "generate:pdf": "node src/index.js --company company-a --profile src/data/profile-with-certs.json --pdf",
+    "lint": "node --check src/index.js && node --check src/ui-server.js",
+    "ui": "node src/ui-server.js"
+  }
+}

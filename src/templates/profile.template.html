@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil - {{personal.name}}</title>
+    <link rel="stylesheet" href="./profile.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__brand">
+          <div class="logo" aria-label="Firmenlogo"></div>
+          <p class="hero__company">{{branding.companyName}}</p>
+        </div>
+        <div class="hero__headline">
+          <p class="eyebrow">Consultant Profil</p>
+          <h1>{{personal.name}}</h1>
+          <p class="hero__meta">{{project.title}} · {{project.client}} · {{project.location}}</p>
+        </div>
+      </header>
+
+      <main>
+        <section class="panel">
+          <h2>Persönliche Daten</h2>
+          <div class="facts-grid">
+            <div class="fact"><span>Name</span><strong>{{personal.name}}</strong></div>
+            <div class="fact"><span>E-Mail</span><strong>{{personal.email}}</strong></div>
+            <div class="fact"><span>Telefon</span><strong>{{personal.phone}}</strong></div>
+            <div class="fact"><span>Standort</span><strong>{{personal.location}}</strong></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Zielprojekt</h2>
+          <div class="facts-grid">
+            <div class="fact"><span>Rolle</span><strong>{{project.title}}</strong></div>
+            <div class="fact"><span>Kunde</span><strong>{{project.client}}</strong></div>
+            <div class="fact"><span>Einsatzort</span><strong>{{project.location}}</strong></div>
+          </div>
+        </section>
+
+        {{#if (hasItems projectExperiences)}}
+        <section class="panel">
+          <h2>Projekterfahrungen</h2>
+          <div class="timeline">
+            {{#each projectExperiences}}
+            <article class="timeline-item">
+              <div class="timeline-item__dot" aria-hidden="true"></div>
+              <div class="timeline-item__content">
+                <div class="timeline-item__head">
+                  <h3>{{name}}</h3>
+                  <p class="period">{{from}} – {{to}}</p>
+                </div>
+                <p class="role"><strong>Rolle:</strong> {{role}}</p>
+                <p>{{description}}</p>
+                {{#if (hasItems technologies)}}
+                <p class="tags"><strong>Technologien:</strong> {{join technologies ", "}}</p>
+                {{/if}}
+              </div>
+            </article>
+            {{/each}}
+          </div>
+        </section>
+        {{/if}}
+
+        <div class="panel-grid">
+          {{#if (hasItems qualifications)}}
+          <section class="panel">
+            <h2>Qualifikationen</h2>
+            <ul class="pill-list">
+              {{#each qualifications}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </section>
+          {{/if}}
+
+          {{#if (hasItems certifications)}}
+          <section class="panel">
+            <h2>Zertifizierungen</h2>
+            <ul class="plain-list">
+              {{#each certifications}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </section>
+          {{/if}}
+
+          {{#if (hasItems other)}}
+          <section class="panel">
+            <h2>Sonstiges</h2>
+            <ul class="plain-list">
+              {{#each other}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </section>
+          {{/if}}
+        </div>
+      </main>
+
+      <footer>
+        <span>Generiert am: {{generatedAt}}</span>
+      </footer>
+    </div>
+  </body>
+</html>

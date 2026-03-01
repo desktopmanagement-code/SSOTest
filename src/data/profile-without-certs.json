@@ -1,0 +1,25 @@
+{
+  "project": {
+    "title": "Fullstack Consultant",
+    "client": "Versicherung Nord",
+    "location": "Hamburg"
+  },
+  "personal": {
+    "name": "Lisa Beispiel",
+    "email": "lisa@example.com",
+    "phone": "+49 151 987654",
+    "location": "Hamburg"
+  },
+  "projectExperiences": [
+    {
+      "name": "Claims Self Service Portal",
+      "from": "2023-01",
+      "to": "2024-04",
+      "role": "Fullstack Engineer",
+      "description": "Aufbau eines Self-Service Portals inkl. Formular-Workflows und Reportings.",
+      "technologies": ["Node.js", "React", "MongoDB"]
+    }
+  ],
+  "qualifications": ["JavaScript", "React", "Node.js"],
+  "other": ["Teilzeit 80% möglich"]
+}

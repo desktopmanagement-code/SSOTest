@@ -1,0 +1,6 @@
+{
+  "companyName": "Firma A GmbH",
+  "primaryColor": "#0055A4",
+  "logoPath": "src/assets/logos/company-a.svg",
+  "cssFile": "src/styles/company-a.css"
+}

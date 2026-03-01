@@ -1,0 +1,34 @@
+{
+  "project": {
+    "title": "Senior Node.js Entwickler",
+    "client": "Musterbank AG",
+    "location": "Remote"
+  },
+  "personal": {
+    "name": "Max Mustermann",
+    "email": "max@example.com",
+    "phone": "+49 170 123456",
+    "location": "Köln"
+  },
+  "projectExperiences": [
+    {
+      "name": "Digitales Kundenportal",
+      "from": "2021-03",
+      "to": "2022-08",
+      "role": "Lead Developer",
+      "description": "Architektur, API Design und Deployment in Kubernetes.",
+      "technologies": ["Node.js", "TypeScript", "PostgreSQL", "Docker"]
+    },
+    {
+      "name": "B2B Partner-Onboarding",
+      "from": "2022-09",
+      "to": "2024-01",
+      "role": "Backend Engineer",
+      "description": "Implementierung von SSO, Audit-Trails und Schnittstellen zu Drittanbietern.",
+      "technologies": ["Express", "OAuth2", "Redis"]
+    }
+  ],
+  "qualifications": ["Node.js", "TypeScript", "REST APIs", "CI/CD"],
+  "certifications": ["AWS Certified Developer", "PSM I"],
+  "other": ["Verfügbar ab 01.06.", "Reisebereitschaft DACH"]
+}
