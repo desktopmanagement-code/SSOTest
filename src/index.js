@@ -315,6 +315,40 @@ async function findWorkingBrowser(customBrowserPath) {
   return '';
 }
 
+
+async function generatePdfWithPlaywright(htmlPath, pdfPath) {
+  let playwright;
+  try {
+    // optional dependency: if not installed, caller falls back to CLI browser mode
+    playwright = require('playwright');
+  } catch (error) {
+    throw new Error('Playwright nicht installiert.');
+  }
+
+  const browser = await playwright.chromium.launch({
+    headless: true,
+    args: ['--no-first-run', '--no-default-browser-check', '--disable-extensions'],
+  });
+
+  try {
+    const page = await browser.newPage();
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
+    await page.pdf({
+      path: pdfPath,
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '10mm',
+        right: '10mm',
+        bottom: '10mm',
+        left: '10mm',
+      },
+    });
+  } finally {
+    await browser.close();
+  }
+}
+
 async function generatePdfWithChromium(htmlPath, pdfPath, customBrowserPath = '') {
   const browserCmd = await findWorkingBrowser(customBrowserPath);
   const fileUrl = `file://${htmlPath}`;
@@ -370,7 +404,9 @@ async function generatePdfWithChromium(htmlPath, pdfPath, customBrowserPath = ''
     }
 
     const details = lastError?.stderr || lastError?.stdout || lastError?.message || 'Keine Details verfügbar.';
-    throw new Error(`PDF-Export mit Headless-Browser fehlgeschlagen. Details: ${details}`);
+    throw new Error(
+      `PDF-Export fehlgeschlagen (Playwright nicht verfügbar oder Browser-CLI fehlgeschlagen). Details: ${details}`,
+    );
   } finally {
     await fs.rm(tempProfileDir, { recursive: true, force: true });
   }
@@ -415,8 +451,13 @@ async function main() {
   console.log(`HTML erstellt: ${path.relative(rootDir, outputHtmlPath)}`);
 
   if (args.pdf) {
-    await generatePdfWithChromium(outputHtmlPath, outputPdfPath, args.browserPath);
-    console.log(`PDF erstellt: ${path.relative(rootDir, outputPdfPath)}`);
+    try {
+      await generatePdfWithPlaywright(outputHtmlPath, outputPdfPath);
+      console.log(`PDF erstellt (Playwright): ${path.relative(rootDir, outputPdfPath)}`);
+    } catch (playwrightError) {
+      await generatePdfWithChromium(outputHtmlPath, outputPdfPath, args.browserPath);
+      console.log(`PDF erstellt (Browser-CLI): ${path.relative(rootDir, outputPdfPath)}`);
+    }
   } else {
     console.log('PDF-Export übersprungen (verwende --pdf).');
   }

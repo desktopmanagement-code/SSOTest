@@ -173,3 +173,16 @@ Technisch passiert dann:
 Damit können auch Remote-User das PDF sofort herunterladen, ohne lokalen Dateizugriff auf den Server.
 
 Hinweis: Wenn im Browser lange nur "Erzeuge PDF für Direkt-Download..." steht, ist das in der Regel **kein CORS-Problem** (UI und API laufen same-origin), sondern ein hängender Browser/PDF-Prozess auf dem Server. Der Server bricht den Generator-Aufruf nach 120s mit Timeout ab und liefert einen Fehler zurück.
+
+
+## PDF-Engine (robuster)
+
+Der Generator versucht zuerst **Playwright** für PDF (stabiler HTML->PDF-Export).
+Wenn Playwright nicht installiert/verfügbar ist, wird auf den bisherigen Browser-CLI Weg zurückgefallen.
+
+Optional installieren:
+
+```bash
+npm install playwright
+npx playwright install chromium
+```
