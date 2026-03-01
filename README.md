@@ -152,3 +152,21 @@ Wichtig:
 - Im UI musst du **nichts mehr manuell im HTML ändern**. Die Firmenliste wird automatisch aus `src/config/*.json` geladen.
 - Der `company`-Wert muss dem Dateinamen ohne `.json` entsprechen (z. B. `AQS`).
 - Falls ein Name nicht passt, zeigt die API jetzt die verfügbaren Config-Namen im Fehlertext.
+
+cd C:\PFAD\ZU\SSOTest
+git switch codex/create-node.js-app-for-dynamic-form-to-pdf
+git pull
+
+
+git stash -u
+git pull
+git stash pop
+
+npm install
+npm run generate:no-certs
+
+von lokal nach git
+
+git status
+git add -A
+git commit -m "Update package.json / local adjustments"
