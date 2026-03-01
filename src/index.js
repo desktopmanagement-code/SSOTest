@@ -263,9 +263,26 @@ async function writeCssBundle(branding) {
   return `${variables}\n${baseCss}\n${companyCss}`;
 }
 
+
+function normalizeBrowserCommand(input) {
+  const cmd = (input || '').trim();
+  if (!cmd) return '';
+
+  if (path.isAbsolute(cmd) && cmd.endsWith('.app')) {
+    if (cmd.endsWith('Google Chrome.app')) {
+      return path.join(cmd, 'Contents', 'MacOS', 'Google Chrome');
+    }
+    if (cmd.endsWith('Microsoft Edge.app')) {
+      return path.join(cmd, 'Contents', 'MacOS', 'Microsoft Edge');
+    }
+  }
+
+  return cmd;
+}
+
 async function findWorkingBrowser(customBrowserPath) {
   const candidates = [
-    customBrowserPath,
+    normalizeBrowserCommand(customBrowserPath),
     'chromium',
     'chromium-browser',
     'google-chrome',
@@ -316,8 +333,7 @@ async function generatePdfWithChromium(htmlPath, pdfPath, customBrowserPath = ''
   const tempProfileDir = await fs.mkdtemp(path.join(os.tmpdir(), 'profile-generator-chrome-'));
 
   try {
-    await execFileAsync(browserCmd, [
-      '--headless=new',
+    const baseArgs = [
       '--disable-gpu',
       '--no-first-run',
       '--no-default-browser-check',
@@ -325,11 +341,26 @@ async function generatePdfWithChromium(htmlPath, pdfPath, customBrowserPath = ''
       '--disable-sync',
       '--disable-background-networking',
       '--allow-file-access-from-files',
+      '--no-startup-window',
       `--user-data-dir=${tempProfileDir}`,
       `--print-to-pdf=${pdfPath}`,
       '--no-margins',
       fileUrl,
-    ]);
+    ];
+
+    const headlessVariants = ['--headless=new', '--headless=chrome', '--headless'];
+    let lastError;
+
+    for (const headlessFlag of headlessVariants) {
+      try {
+        await execFileAsync(browserCmd, [headlessFlag, ...baseArgs]);
+        return;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError || new Error('PDF-Export mit Headless-Browser fehlgeschlagen.');
   } finally {
     await fs.rm(tempProfileDir, { recursive: true, force: true });
   }
