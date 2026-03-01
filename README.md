@@ -167,6 +167,7 @@ Technisch passiert dann:
 1. UI sendet die Profil-Daten an `POST /api/generate-pdf-download`
 2. Server erzeugt HTML/PDF in einem **temporären Verzeichnis**
 3. PDF wird direkt als `attachment` an den Browser zurückgegeben
-4. Temporäre Dateien werden danach gelöscht
+4. Temporäre Dateien liegen unter `output/.tmp/...` (nicht im System-Temp)
+5. Temporäre Dateien werden danach gelöscht
 
 Damit können auch Remote-User das PDF sofort herunterladen, ohne lokalen Dateizugriff auf den Server.

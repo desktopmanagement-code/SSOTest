@@ -1,7 +1,6 @@
 const fs = require('node:fs/promises');
 const http = require('node:http');
 const path = require('node:path');
-const os = require('node:os');
 const crypto = require('node:crypto');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
@@ -80,7 +79,7 @@ async function normalizeCompany(company) {
 
 function makeTempRunDir() {
   const unique = crypto.randomBytes(8).toString('hex');
-  return path.join(os.tmpdir(), `profile-generator-ui-${unique}`);
+  return path.join(rootDir, 'output', '.tmp', `profile-generator-ui-${unique}`);
 }
 
 async function runGenerator({ company, profile, pdf, outputDir, profileFileName = 'ui-profile.json' }) {
@@ -140,6 +139,14 @@ async function generatePdfDownload({ company, profile }) {
       outputDir: tempDir,
       profileFileName: 'ui-profile-download.json',
     });
+
+    try {
+      await fs.access(generated.outputPdfPath);
+    } catch (error) {
+      throw new Error(
+        `PDF wurde nicht erzeugt (${generated.outputPdfPath}). Prüfe Browser-Installation/Flags auf dem Server.`,
+      );
+    }
 
     const pdfBuffer = await fs.readFile(generated.outputPdfPath);
     return { pdfBuffer, company: generated.company };
