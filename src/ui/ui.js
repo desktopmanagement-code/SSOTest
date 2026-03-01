@@ -4,6 +4,7 @@ const template = document.getElementById('experience-template');
 const addBtn = document.getElementById('add-experience');
 const result = document.getElementById('result');
 const companySelect = document.getElementById('company-select');
+const downloadPdfBtn = document.getElementById('download-pdf-btn');
 
 async function loadCompanies() {
   const response = await fetch('/api/companies');
@@ -83,16 +84,19 @@ function collectProfile() {
   };
 }
 
-addBtn.addEventListener('click', () => addExperience());
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  result.textContent = 'Erzeuge Profil...';
-
-  const payload = {
+function buildPayload() {
+  return {
     company: new FormData(form).get('company'),
     pdf: Boolean(new FormData(form).get('pdf')),
     profile: collectProfile(),
   };
+}
+
+async function handleNormalGenerate(event) {
+  event.preventDefault();
+  result.textContent = 'Erzeuge Profil...';
+
+  const payload = buildPayload();
 
   try {
     const response = await fetch('/api/generate', {
@@ -121,7 +125,49 @@ form.addEventListener('submit', async (event) => {
   } catch (error) {
     result.textContent = `Fehler:\n${error.message}`;
   }
-});
+}
+
+async function handleDirectPdfDownload() {
+  result.textContent = 'Erzeuge PDF für Direkt-Download...';
+
+  const payload = buildPayload();
+
+  try {
+    const response = await fetch('/api/generate-pdf-download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      result.textContent = `Fehler:\n${errorData.error || 'Unbekannt'}`;
+      return;
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+
+    const contentDisposition = response.headers.get('content-disposition') || '';
+    const match = contentDisposition.match(/filename="([^"]+)"/i);
+    a.download = match ? match[1] : 'profil.pdf';
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+
+    result.textContent = 'PDF wurde erzeugt und als Download an den Browser ausgeliefert.';
+  } catch (error) {
+    result.textContent = `Fehler:\n${error.message}`;
+  }
+}
+
+addBtn.addEventListener('click', () => addExperience());
+form.addEventListener('submit', handleNormalGenerate);
+downloadPdfBtn.addEventListener('click', handleDirectPdfDownload);
 
 (async () => {
   try {

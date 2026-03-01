@@ -18,7 +18,7 @@
             <label>Firma
               <select name="company" id="company-select" required></select>
             </label>
-            <label class="checkbox"><input type="checkbox" name="pdf" /> PDF mit erzeugen</label>
+            <label class="checkbox"><input type="checkbox" name="pdf" /> PDF lokal im Server-Output speichern</label>
           </div>
           <small id="company-help">Configs werden automatisch aus <code>src/config/*.json</code> geladen.</small>
         </section>
@@ -69,7 +69,10 @@
           </label>
         </section>
 
-        <button class="start" type="submit">START</button>
+        <div class="actions">
+          <button class="start" type="submit">START</button>
+          <button class="download" type="button" id="download-pdf-btn">START + PDF DIREKT DOWNLOAD</button>
+        </div>
       </form>
 
       <pre id="result"></pre>

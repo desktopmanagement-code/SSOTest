@@ -154,3 +154,19 @@ Wichtig:
 - Im UI musst du **nichts mehr manuell im HTML ändern**. Die Firmenliste wird automatisch aus `src/config/*.json` geladen.
 - Der `company`-Wert muss dem Dateinamen ohne `.json` entsprechen (z. B. `AQS`).
 - Falls ein Name nicht passt, zeigt die API jetzt die verfügbaren Config-Namen im Fehlertext.
+
+
+### PDF direkt im Browser herunterladen (remote-fähig)
+
+Wenn die PDF **nicht dauerhaft auf dem Server gespeichert** werden soll, nutze im Profil-Editor den Button:
+
+- `START + PDF DIREKT DOWNLOAD`
+
+Technisch passiert dann:
+
+1. UI sendet die Profil-Daten an `POST /api/generate-pdf-download`
+2. Server erzeugt HTML/PDF in einem **temporären Verzeichnis**
+3. PDF wird direkt als `attachment` an den Browser zurückgegeben
+4. Temporäre Dateien werden danach gelöscht
+
+Damit können auch Remote-User das PDF sofort herunterladen, ohne lokalen Dateizugriff auf den Server.

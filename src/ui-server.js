@@ -1,6 +1,8 @@
 const fs = require('node:fs/promises');
 const http = require('node:http');
 const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 
@@ -18,12 +20,17 @@ function contentTypeFor(filePath) {
   if (filePath.endsWith('.html')) return 'text/html; charset=utf-8';
   if (filePath.endsWith('.css')) return 'text/css; charset=utf-8';
   if (filePath.endsWith('.js')) return 'application/javascript; charset=utf-8';
+  if (filePath.endsWith('.pdf')) return 'application/pdf';
   return 'text/plain; charset=utf-8';
 }
 
-async function serveFile(res, filePath) {
+async function serveFile(res, filePath, asAttachment = false) {
   const content = await fs.readFile(filePath);
-  res.writeHead(200, { 'Content-Type': contentTypeFor(filePath) });
+  const headers = { 'Content-Type': contentTypeFor(filePath) };
+  if (asAttachment) {
+    headers['Content-Disposition'] = `attachment; filename="${path.basename(filePath)}"`;
+  }
+  res.writeHead(200, headers);
   res.end(content);
 }
 
@@ -71,26 +78,74 @@ async function normalizeCompany(company) {
   );
 }
 
-async function runGenerate({ company, profile, pdf }) {
-  const outputDir = path.join(rootDir, 'output');
-  const profilePath = path.join(outputDir, 'ui-profile.json');
-  const normalizedCompany = await normalizeCompany(company);
+function makeTempRunDir() {
+  const unique = crypto.randomBytes(8).toString('hex');
+  return path.join(os.tmpdir(), `profile-generator-ui-${unique}`);
+}
 
+async function runGenerator({ company, profile, pdf, outputDir, profileFileName = 'ui-profile.json' }) {
+  const normalizedCompany = await normalizeCompany(company);
   await fs.mkdir(outputDir, { recursive: true });
+
+  const profilePath = path.join(outputDir, profileFileName);
+  const outputHtmlPath = path.join(outputDir, 'profile.html');
+  const outputPdfPath = path.join(outputDir, 'profile.pdf');
+
   await fs.writeFile(profilePath, JSON.stringify(profile, null, 2), 'utf8');
 
-  const args = ['src/index.js', '--company', normalizedCompany, '--profile', profilePath];
+  const args = [
+    'src/index.js',
+    '--company',
+    normalizedCompany,
+    '--profile',
+    profilePath,
+    '--output-html',
+    outputHtmlPath,
+    '--output-pdf',
+    outputPdfPath,
+  ];
+
   if (pdf) args.push('--pdf');
 
   await execFileAsync('node', args, { cwd: rootDir });
 
   return {
     company: normalizedCompany,
+    outputHtmlPath,
+    outputPdfPath,
+    profilePath,
+  };
+}
+
+async function runGenerate({ company, profile, pdf }) {
+  const outputDir = path.join(rootDir, 'output');
+  const generated = await runGenerator({ company, profile, pdf, outputDir });
+
+  return {
+    company: generated.company,
     outputHtml: 'output/profile.html',
     outputPdf: pdf ? 'output/profile.pdf' : '',
     openUrl: `http://localhost:${port}/output/profile.html`,
     profile,
   };
+}
+
+async function generatePdfDownload({ company, profile }) {
+  const tempDir = makeTempRunDir();
+  try {
+    const generated = await runGenerator({
+      company,
+      profile,
+      pdf: true,
+      outputDir: tempDir,
+      profileFileName: 'ui-profile-download.json',
+    });
+
+    const pdfBuffer = await fs.readFile(generated.outputPdfPath);
+    return { pdfBuffer, company: generated.company };
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
 }
 
 const server = http.createServer(async (req, res) => {
@@ -119,7 +174,7 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && url.pathname.startsWith('/output/')) {
       const target = path.join(rootDir, url.pathname.replace(/^\//, ''));
-      await serveFile(res, target);
+      await serveFile(res, target, url.searchParams.get('download') === '1');
       return;
     }
 
@@ -130,6 +185,22 @@ const server = http.createServer(async (req, res) => {
       const pdf = Boolean(body.pdf);
       const result = await runGenerate({ company, profile, pdf });
       sendJson(res, 200, result);
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/generate-pdf-download') {
+      const body = await parseBody(req);
+      const company = body.company || '';
+      const profile = body.profile || {};
+
+      const generated = await generatePdfDownload({ company, profile });
+      const fileName = `profil-${generated.company}.pdf`;
+
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      });
+      res.end(generated.pdfBuffer);
       return;
     }
 

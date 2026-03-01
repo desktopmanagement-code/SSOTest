@@ -9,7 +9,9 @@ input, textarea, select { padding: 8px; border: 1px solid #bfc9dd; border-radius
 .checkbox { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
 .experience-item { border: 1px dashed #9fb0cc; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fafcff; }
 button { border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .start { background: #0055a4; color: #fff; font-weight: 700; width: 160px; }
+.download { background: #0a7e3e; color: #fff; font-weight: 700; }
 .remove { background: #fbe4e4; color: #8a1111; }
 #add-experience { background: #e6edf8; }
 pre { background: #101a28; color: #d9e7ff; padding: 12px; border-radius: 8px; white-space: pre-wrap; }
