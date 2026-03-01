@@ -280,7 +280,15 @@ async function findWorkingBrowser(customBrowserPath) {
 
   for (const cmd of candidates) {
     try {
-      await execFileAsync(cmd, ['--version']);
+      // For explicit paths, only verify file existence (no process start).
+      if (path.isAbsolute(cmd)) {
+        await fs.access(cmd);
+        return cmd;
+      }
+
+      // For command names, resolve via shell lookup to avoid spawning browser UI.
+      const lookupCmd = process.platform === 'win32' ? 'where' : 'which';
+      await execFileAsync(lookupCmd, [cmd]);
       return cmd;
     } catch (error) {
       // try next candidate

@@ -88,6 +88,8 @@ npm run generate -- --pdf
 Hinweis zu Chrome-Fenstern:
 Der PDF-Export startet Chrome/Edge mit einem temporären Profil im Headless-Modus (`--headless=new`).
 Damit sollte kein sichtbares Startseiten-Fenster mehr aufgehen.
+Zusätzlich wird die Browser-Erkennung ohne Browser-Start durchgeführt (`where`/`which` bzw. Dateipfad-Prüfung),
+damit bei der Erkennung selbst kein Fenster geöffnet wird.
 
 ## CLI-Optionen
 
